@@ -1,5 +1,9 @@
+#include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -7,8 +11,13 @@ int main(int argc, char **argv) {
   uint8_t buf[4096];
   ssize_t nread;
 
-  while ((nread = read(0, buf, sizeof(buf))) > 0)
-    write(1, buf, nread);
+  int fd = open(argv[1], O_RDONLY);
+  if (fd < 0) {
+    fprintf(stderr, "cannot open %s: %s\n", argv[1], strerror(errno));
+    exit(1);
+  }
 
+  while ((nread = read(fd, buf, sizeof(buf))) > 0)
+    write(1, buf, nread);
   return 0;
 }
